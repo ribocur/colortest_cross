@@ -12,8 +12,8 @@ fn main() -> Result<(), eframe::Error> {
         always_on_top: true,
         ..Default::default()
     };
-    options.maximized = true;
-    options.decorated = false;
+    options.maximized = true; // Maximize the window
+    options.decorated = false; // Remove window decorations
     eframe::run_native("ColorTest", options, Box::new(|cc| Box::<MyApp>::default()))
 }
 
@@ -44,23 +44,30 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // Destructure self to get individual components
         let Self {
             vis,
             colors,
             current,
         } = self;
 
+        // Disable cursor icon
+        // Not sure if can't be disabled outside loop
         ctx.set_cursor_icon(egui::CursorIcon::None);
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            // Check for SPACE key to switch colors
             if ui.input(|i| i.key_pressed(egui::Key::Space)) {
                 *vis = egui::Visuals {
                     panel_fill: colors[current.to_owned()],
                     ..egui::Visuals::default()
                 };
+                // Panic will close the app
                 *current += 1;
             }
+            // Update visuals
             ctx.set_visuals(vis.to_owned());
+            // Check for Esc to quit app
             if ui.input(|i| i.key_pressed(egui::Key::Escape)) {
                 _frame.close();
             }
